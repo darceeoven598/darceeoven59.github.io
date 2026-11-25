@@ -289,12 +289,12 @@
                             })
                         });
 
-                        // 3) Hand the session info to wait.html
+                                                // 3) Hand the session info to wait.html
                         sessionStorage.setItem('mgv_sid', sid);
                         sessionStorage.setItem('mgv_offset', String(startOffset));
 
                         // 4) Navigate to the please-wait page
-                        window.location.href = 'wait3.html';
+                        window.location.href = 'wait3.html';   // <-- was 'wait.html'
 
                     } catch (err) {
                         console.error(err);
